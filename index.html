@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=WINDOWS-1251" />
+		<meta http-equiv="Content-Type" content="text/html">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width = device-width">
+		<title>Выпускной альбом ШРИ-2013</title>
+		<link href ="styles.css" rel="stylesheet" type= "text/css" />
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+		<script type="text/javascript" src="rainbowler.js"></script>
+		<script type="text/javascript" src="components.js"></script>
+
+		<script>
+			//global variables 
+			var storage = window.localStorage;
+		
+			$(document).ready(function(){
+			
+				//putting json data into localStorage				
+				$.getJSON( "https://dl.dropboxusercontent.com/u/1122837/shri.json", function( data ){
+
+					$.each(data, function( key, val ){	
+						storage.setItem(key, JSON.stringify(val))
+					});
+				
+					//загрузка приложения
+					App.init();
+				
+				})	
+			})	
+		</script>	
+			
+	</head>
+	<body>
+		<h1 class="grey_block bottom_ends">Выпускной альбом ШРИ-2013</h1>
+		
+		<div id="wrapper">
+		
+			<h2>Список лекторов</h2>
+			<div id="nav">
+				<ul id="lectors">	
+				</ul>			
+			</div>	
+			
+			<div id="okno" class="full_border padding10 light_block"></div>
+			
+			<h2 class="clear">Список лекций</h2>
+			
+			<div id="lectures" class="full_border padding10 light_block full_width fly_higher">
+				<ul>
+				</ul>	
+			</div>
+			
+		</div>	
+
+	</body>
+</html>
