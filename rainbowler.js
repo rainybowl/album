@@ -220,8 +220,7 @@
 					 _lector += '<p class="about">' + data.details.about + '</p>';
 					 
 					 _lector += '<div class="h15" />';
-					 _lector += '<h3 class="italic stressed">Лекции:</h3>';
-					 _lector += '<ul class="lec"></ul>';
+					 _lector += '<ul class="lec"><span class="italic stressed center">Лекции:</span></ul>';
 					 
 					 var lector = $('<div>' + _lector + '</div>');
 					 return lector;
