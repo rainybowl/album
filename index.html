@@ -21,9 +21,11 @@
 				//putting json data into localStorage				
 				$.getJSON( "https://dl.dropboxusercontent.com/u/1122837/shri.json", function( data ){
 
-					$.each(data, function( key, val ){	
-						storage.setItem(key, JSON.stringify(val))
-					});
+					if(!storage.getItem('lectures')) {
+						$.each(data, function( key, val ){	
+							storage.setItem(key, JSON.stringify(val))
+						});					
+					}
 				
 					//загрузка приложения
 					App.init();
