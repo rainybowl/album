@@ -68,10 +68,6 @@
 					templates.applyTemplates( 'lectors 6', 'lector', '#okno' );	//явное указание шаблона-пути!
 					templates.applyTemplates( 'lectors 6 all_lectures', 'smallList', '#okno ul' );	
 					
-					//templates.applyTemplates('lectors[id=183]');	
-					
-					 Tools.objectParser( JSON.parse( storage.getItem('lectors' )), 'id', 183 );
-					
 				}
 	
 			}
@@ -83,6 +79,7 @@
 			*	
 			*	@method pathFinder ({String}) - возвращает узел JSON по заданному пути
 			*  @method objectParser ({Object}, {String}, {String}) - возвращает объект с заданным значением свойства
+			*  @method pathParser {String} - парсинг пути (проверка на наличие в пути свойств)
 			*
 			***/
 			
@@ -90,21 +87,11 @@
 				
 				pathFinder: function(path){
 					var path = path.split(' ');
-					 
-					 /* parsing test */
-					 
-					if(path[0].indexOf('[') != -1)  {
-						path[0] = path[0].substring(0, path[0].indexOf('[')-1)
-						console.log(path[0])
-						}
 					
-					
-					/* */			
-					
-					var obj = JSON.parse( storage.getItem(path[0]) );
-					
-					//добавить парсинг-выборку по свойству!
-					
+					var obj = this.pathParser(path[0]);
+
+					//console.log(obj)			
+
 					//если не первая нода
 					if(path.length > 1){
 						var i = 1;
@@ -116,21 +103,40 @@
 					return obj;
 				},
 				
-				objectParser: function(obj, prop, val){
 				
-					var i, veryObj;
-					for(i=0; i<obj.length; i++){
-						var curObj = obj[i];
+				objectParser: function(obj, prop, val){
+
+					var veryObj;
 					
-						if(curObj[prop] == val) {
-						//	console.log(curObj)
-							veryObj = obj;	
-						}		
-					}
+					$.each(obj, function( k, v ){
+						if(obj[k][prop] == val)	
+						veryObj = obj[k]
+					//	return obj[k]; //change it this way!			
+					})					
 				
 					return veryObj;
-				}
-
+				},
+				
+				pathParser: function(pathStr){
+						
+						if(pathStr.indexOf('[') != -1) {
+							var _originalPath = pathStr;
+							//returns nodename (e.g. lector)
+							var pathStr = pathStr.substring(0, pathStr.indexOf('['))			
+							
+							// returns [param, value]
+							var _path = /\[.*=.*\]/.exec(	_originalPath.toString() );
+							_path = _path.toString().replace(/[ \[\] ]*/g, '').split('='); 
+							
+							obj =  this.objectParser(  JSON.parse( storage.getItem(pathStr) ), _path[0], _path[1])	
+						}
+						else{
+								obj = JSON.parse( storage.getItem(pathStr) ) 
+							}	
+							
+						return obj;				
+					}
+					
 			}
 				
 
@@ -182,8 +188,8 @@
 						list.click(function(){
 								App.clean($('#okno'))
 								// this is not very nice:
-								templates.applyTemplates( 'lectors 7', 'lector', '#okno' );	
-								templates.applyTemplates( 'lectors 7 all_lectures', 'smallList', '#okno ul' );						
+								templates.applyTemplates( 'lectors[id=' + data.details.id +']', 'lector', '#okno' );	
+								templates.applyTemplates( 'lectors[id=' + data.details.id +'] all_lectures', 'smallList', '#okno ul' );						
 							})
 							
 						return list;
@@ -255,8 +261,11 @@
 						lastNode = _nodes[i-1];
 						i--;
 					}
-		
 					
+					if(lastNode.indexOf('[') != -1){
+						lastNode = lastNode.substring(0, lastNode.indexOf('['))
+						}
+		
 					nodeToProcess = Tools.pathFinder(nodeToProcess);
 
 					if (nodeToProcess[0]){ //is an array
