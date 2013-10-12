@@ -21,7 +21,6 @@
 				//putting json data into localStorage				
 				$.getJSON( "https://dl.dropboxusercontent.com/u/1122837/shri.json", function( data ){
 
-					
 						$.each(data, function( key, val ){	
 							if(!storage.getItem(key)) {
 								storage.setItem(key, JSON.stringify(val));
@@ -36,12 +35,12 @@
 					templates.applyTemplates('lectors');	
 						
 					if(App.mode.show != 'normal'){
-						templates.applyTemplates( App.mode.show + '[id=' + App.mode.id + ']', 'lector', '#okno' );	//явное указание шаблона-пути!
+						templates.applyTemplates( App.mode.show + '[id=' + App.mode.id + ']', 'lector', '#okno' );	//явное указание шаблона
 						templates.applyTemplates( App.mode.show + '[id=' + App.mode.id + '] all_lectures', 'smallList', '#okno ul' );	
 					
 					}		
 					else{
-						templates.applyTemplates( 'lectors 0', 'lector', '#okno' );	//явное указание шаблона-пути!
+						templates.applyTemplates( 'lectors 0', 'lector', '#okno' );	//явное указание шаблона
 						templates.applyTemplates( 'lectors 0 all_lectures', 'smallList', '#okno ul' );	
 					}
 				
