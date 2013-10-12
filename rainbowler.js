@@ -62,12 +62,6 @@
 
 					this.checkMode();		
 					this.addComponents(settings);	
-					
-					templates.applyTemplates('lectures');
-					templates.applyTemplates('lectors');	
-					templates.applyTemplates( 'lectors 6', 'lector', '#okno' );	//явное указание шаблона-пути!
-					templates.applyTemplates( 'lectors 6 all_lectures', 'smallList', '#okno ul' );	
-					
 				}
 	
 			}
