@@ -82,6 +82,7 @@
 				background: none;
 				border: none;
 				margin: 0 10px;
+				clear: both;
 			}
 			
 				ul.lec li {
@@ -157,6 +158,10 @@
 			.full_width	{
 				width: 900px;
 			}
+			
+			.full_height	{
+				height: 100%;
+			}
 
 			.clear	{
 				clear: both;
@@ -168,5 +173,9 @@
 			
 			.fly_higher {
 				height: 100%;
+			}
+			
+			.center {
+				text-align: center;
 			}
 			
