@@ -81,15 +81,12 @@
 				
 				pathFinder: function(path){
 					var path = path.split(' ');
-					
 					var obj = this.pathParser(path[0]);
-
-					//console.log(obj)			
-
-					//если не первая нода
+		
 					if(path.length > 1){
 						var i = 1;
 						while(i < path.length ){
+							// use pathParser here too?
 								obj = obj[path[i]];
 								i++;
 							}	
@@ -104,8 +101,7 @@
 					
 					$.each(obj, function( k, v ){
 						if(obj[k][prop] == val)	
-						veryObj = obj[k]
-					//	return obj[k]; //change it this way!			
+						veryObj = obj[k]			
 					})					
 				
 					return veryObj;
@@ -115,7 +111,8 @@
 						
 						if(pathStr.indexOf('[') != -1) {
 							var _originalPath = pathStr;
-							//returns nodename (e.g. lector)
+							
+							//returns nodename
 							var pathStr = pathStr.substring(0, pathStr.indexOf('['))			
 							
 							// returns [param, value]
@@ -181,7 +178,6 @@
 						
 						list.click(function(){
 								App.clean($('#okno'))
-								// this is not very nice:
 								templates.applyTemplates( 'lectors[id=' + data.details.id +']', 'lector', '#okno' );	
 								templates.applyTemplates( 'lectors[id=' + data.details.id +'] all_lectures', 'smallList', '#okno ul' );						
 							})
@@ -192,21 +188,20 @@
 				
 				largeList: function ( data ) {
 					
-						var _list = '<li id="' + data.details.id +'">' + data.details.name + ':   ';
-						
+						var lct = Tools.pathFinder("lectors[id=" + data.details.lector_id + "]" ).name;						
 
+						var _list = '<li id="' + data.details.id +'">' + data.details.name + ' (' + lct + '):   ';
+						
 						if(data.details.slides_url)
 						_list += '<a href="' + data.details.slides_url + '" class="full_border light_block nodecor">Слайды</a>  |  ';	
 						
 						if(data.details.video_url)
-						_list += '<a href="' + data.details.video_url + '" class="full_border light_block nodecor">Видео</a>';	
-						//_list += '<a href="">Лектор - </a>';						
-						
+						_list += '<a href="' + data.details.video_url + '" class="full_border light_block nodecor">Видео</a>  |  ';
+								
 						_list += '</li>';
 						
 						var list = $('<div>' + _list + '</div>');
-						return list;
-						
+						return list;		
 				},
 				
 				photo: function(data){
@@ -216,9 +211,9 @@
 				
 				lector: function(data){
 					
-					var _lector = '<img src="' + data.details.photo_url + '"/>';
+					var _lector = '<div class="full_height"><img src="' + data.details.photo_url + '"/></div>';
 		 
-					 _lector += '<span class="name">' + data.details.name + '<span>';
+					 _lector += '<span class="name">' + data.details.name + '</span>';
 					 _lector += '<br/>';
 					 
 					 if(data.details.about)
@@ -244,7 +239,7 @@
 					
 					if(!nodeToProcess || typeof nodeToProcess !== 'string') throw new Error('Не задан путь к узлу JSON!');
 
-					//определить, какой шаблон использовать и куда постить
+					//определение имени последнего узла (= имени шаблона)
 				
 					var _nodes = nodeToProcess.split(' ');
 					
@@ -261,6 +256,8 @@
 						}
 		
 					nodeToProcess = Tools.pathFinder(nodeToProcess);
+					
+					if(!nodeToProcess) throw new Error('Узел не найден!'); 
 
 					if (nodeToProcess[0]){ //is an array
 						$.each(nodeToProcess, function( k, obj ){
