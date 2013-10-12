@@ -30,6 +30,20 @@
 				
 					//загрузка приложения
 					App.init();
+					
+					//шаблоны
+					templates.applyTemplates('lectures');
+					templates.applyTemplates('lectors');	
+						
+					if(App.mode.show != 'normal'){
+						templates.applyTemplates( App.mode.show + '[id=' + App.mode.id + ']', 'lector', '#okno' );	//явное указание шаблона-пути!
+						templates.applyTemplates( App.mode.show + '[id=' + App.mode.id + '] all_lectures', 'smallList', '#okno ul' );	
+					
+					}		
+					else{
+						templates.applyTemplates( 'lectors 0', 'lector', '#okno' );	//явное указание шаблона-пути!
+						templates.applyTemplates( 'lectors 0 all_lectures', 'smallList', '#okno ul' );	
+					}
 				
 				})	
 			})	
