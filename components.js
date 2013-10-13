@@ -1,6 +1,6 @@
 var settings = {
 	'lectures': {
-		template: 'smallList',
+		template: 'largeList',
 		path: '#lectures ul'		
 	},
 	
