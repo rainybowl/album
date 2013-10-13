@@ -1,13 +1,15 @@
-			/* Параметры приложения: режим отображения, категории входных данных и т.д.
-			
-				@property mode - режим отображения (зависит от наличия параметров в url)
-				@property components - ключи данных и соответствующие им шаблоны для обработки 
-				
-				@method checkMode - метод для проверки на наличие параметров в url и переключение режима отображения 
-				@method init - загрузка приложения
-				@method addComponents - метод для задания параметров шаблонизации (свойства components)
-			
-			 */
+			/*** 
+			*
+			*	Параметры приложения: режим отображения, типы принимаемых данных и т.д.
+			*
+			*	@property mode {Object} - режим отображения (зависит от наличия параметров в url)
+			*	@property components {Object} - ключи данных и соответствующие им шаблоны для обработки 
+			*	
+			*	@method checkMode - метод для проверки на наличие параметров в url и переключение режима отображения 
+			*	@method init ({Object})- загрузка приложения
+			*	@method addComponents - метод для задания параметров шаблонизации (свойства components)
+			*
+			***/
 			
 			var App = {
 	
@@ -51,6 +53,7 @@
 					this.components = set;
 				},
 				
+			
 				clean: function(elem){
 					elem.html('');
 				},
@@ -59,67 +62,84 @@
 
 					this.checkMode();		
 					this.addComponents(settings);	
-					
-					templates.applyTemplates('lectures');
-					templates.applyTemplates('lectors');	
-					templates.applyTemplates( 'lectors 6', 'lector', '#okno' );	//явное указание шаблона-пути!
-					templates.applyTemplates( 'lectors 6 all_lectures' );	
-				},
-				
-				reload: function(){
-					this.clean();
-					//+ reload with params
 				}
+	
 			}
 			
 			
-			/* Инструменты
-				
-				@method pathFinder - возвращает узел JSON по пути
-			
-			*/
+			/***
+			*
+			*	Инструменты
+			*	
+			*	@method pathFinder ({String}) - возвращает узел JSON по заданному пути
+			*  @method objectParser ({Object}, {String}, {String}) - возвращает объект с заданным значением свойства
+			*  @method pathParser {String} - парсинг пути (проверка на наличие в пути свойств)
+			*
+			***/
 			
 			var Tools = {
-				/*
-				pathFinder: function(path){
-					var path = path.split(' ')
-					var obj = JSON.parse( storage.getItem(path[0]) );
-					
-					//добавить парсинг-выборку по свойству!
-					
-					//если не первая нода
-					if(path.length > 1){
-						var i = 1;
-						while(i < path.length ){
-								//obj = ( Number(path[i])) ? obj[i-1] : obj[path[i]];
-								obj = obj[path[i]];
-								i++;
-							}	
-					}
-					return obj;
-				} 
-				*/
 				
 				pathFinder: function(path){
-					var path = path.split(' ')
-					var obj = JSON.parse( storage.getItem(path[0]) );
-					
-					//добавить парсинг-выборку по свойству!
-					
-					//если не первая нода
+					var path = path.split(' ');
+					var obj = this.pathParser(path[0]);
+		
 					if(path.length > 1){
 						var i = 1;
 						while(i < path.length ){
-								//obj = ( Number(path[i])) ? obj[i-1] : obj[path[i]];
+							// use pathParser here too?
 								obj = obj[path[i]];
 								i++;
 							}	
 					}
 					return obj;
-				}
-			}
+				},
+				
+				
+				objectParser: function(obj, prop, val){
 
-			/* Шаблоны для обработки элементов */	
+					var veryObj;
+					
+					$.each(obj, function( k, v ){
+						if(obj[k][prop] == val)	
+						veryObj = obj[k]			
+					})					
+				
+					return veryObj;
+				},
+				
+				pathParser: function(pathStr){
+						
+						if(pathStr.indexOf('[') != -1) {
+							var _originalPath = pathStr;
+							
+							//returns nodename
+							var pathStr = pathStr.substring(0, pathStr.indexOf('['))			
+							
+							// returns [param, value]
+							var _path = /\[.*=.*\]/.exec(	_originalPath.toString() );
+							_path = _path.toString().replace(/[ \[\] ]*/g, '').split('='); 
+							
+							obj =  this.objectParser(  JSON.parse( storage.getItem(pathStr) ), _path[0], _path[1])	
+						}
+						else{
+								obj = JSON.parse( storage.getItem(pathStr) ) 
+							}	
+							
+						return obj;				
+					}
+					
+			}
+				
+
+			/***
+			* 
+			* Шаблоны для обработки элементов 
+			*
+			* @method addTemplate ({String}) - метод для динамического добавления новых шаблонов (в разработке)
+			* @method applyer ({Object}) - вызов шаблона для обработки одного элемента
+			* @method applyTemplates ({String}) - обработка одного или нескольких элементов по заданному пути. Вторым и третьим параметром можно вручную задать шаблон и узел DOM-дерева, в котором будет размешен созданный HTML-код.
+			*
+			***/	
 		
 			var templates = {
 			
@@ -146,10 +166,42 @@
 
 					return container;
 				},
+				
+				li: function(id, contents){
+					return $('<li id="' + id +'">' +contents + '</li>');
+					},
 			
 				smallList: function ( data ) {
-						var list = $('<li id="' + data.details.id + '"><a href="' + data.details.slides_url + '" contenteditable="true">' + data.details.name + '</a></li>');
+						//var list = $('<li id="' + data.details.id +'">' + data.details.name + '</li>');
+			
+						var list = this.li( data.details.id, data.details.name );
+						
+						list.click(function(){
+								App.clean($('#okno'))
+								templates.applyTemplates( 'lectors[id=' + data.details.id +']', 'lector', '#okno' );	
+								templates.applyTemplates( 'lectors[id=' + data.details.id +'] all_lectures', 'smallList', '#okno ul' );						
+							})
+							
 						return list;
+		
+				},
+				
+				largeList: function ( data ) {
+					
+						var lct = Tools.pathFinder("lectors[id=" + data.details.lector_id + "]" ).name;						
+
+						var _list = '<li id="' + data.details.id +'">' + data.details.name + ' (' + lct + '):   ';
+						
+						if(data.details.slides_url)
+						_list += '<a href="' + data.details.slides_url + '" class="full_border light_block nodecor">Слайды</a>  |  ';	
+						
+						if(data.details.video_url)
+						_list += '<a href="' + data.details.video_url + '" class="full_border light_block nodecor">Видео</a>  |  ';
+								
+						_list += '</li>';
+						
+						var list = $('<div>' + _list + '</div>');
+						return list;		
 				},
 				
 				photo: function(data){
@@ -159,14 +211,16 @@
 				
 				lector: function(data){
 					
-					var _lector = '<img src="' + data.details.photo_url + '"/>';
+					var _lector = '<div class="full_height"><img src="' + data.details.photo_url + '"/></div>';
 		 
-					 _lector += '<span class="italic">' + 'ФИО: ' + '</span>';
-					 _lector += '<span class="name">' + data.details.name + '<span>';
+					 _lector += '<span class="name">' + data.details.name + '</span>';
 					 _lector += '<br/>';
 					 
 					 if(data.details.about)
-					 _lector += '<p>' + data.details.about + '</p>';
+					 _lector += '<p class="about">' + data.details.about + '</p>';
+					 
+					 _lector += '<div class="h15" />';
+					 _lector += '<ul class="lec"><span class="italic stressed center">Лекции:</span></ul>';
 					 
 					 var lector = $('<div>' + _lector + '</div>');
 					 return lector;
@@ -181,8 +235,10 @@
 				},
 
 				applyTemplates: function(nodeToProcess, template, path){
+					
+					if(!nodeToProcess || typeof nodeToProcess !== 'string') throw new Error('Не задан путь к узлу JSON!');
 
-				//определить, какой шаблон использовать и куда постить
+					//определение имени последнего узла (= имени шаблона)
 				
 					var _nodes = nodeToProcess.split(' ');
 					
@@ -194,8 +250,13 @@
 						i--;
 					}
 					
-				
+					if(lastNode.indexOf('[') != -1){
+						lastNode = lastNode.substring(0, lastNode.indexOf('['))
+						}
+		
 					nodeToProcess = Tools.pathFinder(nodeToProcess);
+					
+					if(!nodeToProcess) throw new Error('Узел не найден!'); 
 
 					if (nodeToProcess[0]){ //is an array
 						$.each(nodeToProcess, function( k, obj ){
