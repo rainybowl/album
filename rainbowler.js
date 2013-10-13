@@ -193,10 +193,10 @@
 						var _list = '<li id="' + data.details.id +'">' + data.details.name + ' (' + lct + '):   ';
 						
 						if(data.details.slides_url)
-						_list += '<a href="' + data.details.slides_url + '" class="full_border light_block nodecor">Слайды</a>  |  ';	
+						_list += '<a href="' + data.details.slides_url + '" class="full_border light_block nodecor">Слайды</a>';	
 						
 						if(data.details.video_url)
-						_list += '<a href="' + data.details.video_url + '" class="full_border light_block nodecor">Видео</a>  |  ';
+						_list += '   |   <a href="' + data.details.video_url + '" class="full_border light_block nodecor">Видео</a>';
 								
 						_list += '</li>';
 						
